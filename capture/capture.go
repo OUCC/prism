@@ -5,13 +5,18 @@ package capture
 #include <sys/mman.h>
 #include <sys/types.h>
 
-int somemacro (int fd) {
+// synchronous I/O multiplexing 同期I/Oの多重化
+int syncio (int fd) {
+	// set of file descriptor
 	fd_set fds;
+	// clear all
 	FD_ZERO(&fds);
+	// set file descriptors
 	FD_SET(fd, &fds);
-	struct timeval tv = {0};
-	tv.tv_sec = 20;
-	return select(fd+1, &fds, 0, 0, &tv);
+	struct timeval timeout = {0};
+	timeout.tv_sec = 2; // 2 sec
+	// wait until
+	return select(fd+1, &fds, 0, 0, &timeout);
 }
 */
 import "C"
@@ -22,6 +27,11 @@ import (
 	"os"
 	"syscall"
 	"unsafe"
+)
+
+const (
+	BUFFER_COUNT  = 8
+	IGNORE_FRAMES = 10
 )
 
 var (
@@ -38,7 +48,8 @@ func Capture(device string) (image.Image, error) {
 	}
 	defer vd.Close()
 
-	width, height, formats, err := getInfo(vd, true)
+	//width, height, formats, err := getInfo(vd, true) // for debug
+	width, height, formats, err := getInfo(vd, false)
 	if err != nil {
 		return nil, err
 	}
@@ -87,11 +98,15 @@ func getInfo(vd *os.File, show bool) (int, int, []C.__u32, error) {
 		return 0, 0, nil, err
 	}
 	if show {
-		fmt.Printf("Driver Capability:\n" +
-			"    Driver: \"%s\"\n" +
-			"    Card: \"%s\"\n" +
-			"    Bus: \"%s\"\n" +
-			"    Capabilities: %08x\n")
+		fmt.Printf("Driver Capability:\n"+
+			"    Driver: \"%s\"\n"+
+			"    Card: \"%s\"\n"+
+			"    Bus: \"%s\"\n"+
+			"    Capabilities: %08x\n",
+			caps.driver,
+			caps.card,
+			caps.bus_info,
+			caps.capabilities)
 	}
 
 	// get crop info
@@ -163,59 +178,82 @@ func setFormat(vd *os.File, w, h, pixfmt int) (int, int, error) {
 }
 
 func getFrame(vd *os.File) ([]byte, error) {
-	// request buffer
+	// initiate Memory Mapping  I/O
 	var reqbuf C.struct_v4l2_requestbuffers
 	reqbuf._type = C.V4L2_BUF_TYPE_VIDEO_CAPTURE
-	reqbuf.count = 1
 	reqbuf.memory = C.V4L2_MEMORY_MMAP
+	reqbuf.count = BUFFER_COUNT
 
 	err := ioctl(vd, C.VIDIOC_REQBUFS, uintptr(unsafe.Pointer(&reqbuf)))
 	if err != nil {
 		return nil, err
 	}
 
-	// query buffer
-	var buf C.struct_v4l2_buffer
-	buf._type = C.V4L2_BUF_TYPE_VIDEO_CAPTURE
-	buf.memory = C.V4L2_MEMORY_MMAP
-	buf.index = 0
+	// initiate buffer
+	buffers := make([]unsafe.Pointer, reqbuf.count)
+	for i := 0; i < int(reqbuf.count); i++ {
+		// query the status of a buffer
+		// bufinfo contains data exchanged by application and driver
+		var bufinfo C.struct_v4l2_buffer
+		bufinfo._type = reqbuf._type
+		bufinfo.memory = reqbuf.memory
+		bufinfo.index = C.__u32(i)
 
-	err = ioctl(vd, C.VIDIOC_QUERYBUF, uintptr(unsafe.Pointer(&buf)))
+		err = ioctl(vd, C.VIDIOC_QUERYBUF, uintptr(unsafe.Pointer(&bufinfo)))
+		if err != nil {
+			return nil, err
+		}
+
+		// get offest (__u32) in union m in struct v4l2_buffer as __off_t
+		offset := *(*C.__off_t)(unsafe.Pointer(&bufinfo.m[0]))
+		// map the device to memory
+		buffers[i] = C.mmap(nil, C.size_t(bufinfo.length), C.PROT_READ|C.PROT_WRITE, C.MAP_SHARED,
+			C.int(vd.Fd()), offset)
+		defer C.munmap(buffers[i], C.size_t(bufinfo.length))
+
+		// enqueue buffers
+		err = ioctl(vd, C.VIDIOC_QBUF, uintptr(unsafe.Pointer(&bufinfo)))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Start streaming I/O
+	err = ioctl(vd, C.VIDIOC_STREAMON, uintptr(unsafe.Pointer(&reqbuf._type)))
 	if err != nil {
 		return nil, err
 	}
+	defer ioctl(vd, C.VIDIOC_STREAMOFF, uintptr(unsafe.Pointer(&reqbuf._type)))
 
-	buffer := C.mmap(nil, C.size_t(buf.length), C.PROT_READ|C.PROT_WRITE, C.MAP_SHARED, C.int(vd.Fd()),
-		*(*C.__off_t)(unsafe.Pointer(&buf.m[0])))
-	fmt.Printf("Length: %d\nAddress: %p\n", buf.length, buffer)
-	fmt.Printf("Image Length: %d\n", buf.bytesused)
+	i := IGNORE_FRAMES
+	for {
+		// wait until device is ready
+		e := C.syncio(C.int(vd.Fd()))
+		if e == -1 || e == 0 {
+			return nil, ErrUnknown
+		}
 
-	var qbuf C.struct_v4l2_buffer
-	qbuf._type = C.V4L2_BUF_TYPE_VIDEO_CAPTURE
-	qbuf.memory = C.V4L2_MEMORY_MMAP
-	qbuf.index = 0
+		// dequeue buffer
+		var bufinfo C.struct_v4l2_buffer
+		bufinfo._type = reqbuf._type
+		bufinfo.memory = reqbuf.memory
 
-	err = ioctl(vd, C.VIDIOC_QBUF, uintptr(unsafe.Pointer(&qbuf)))
-	if err != nil {
-		return nil, err
+		err := ioctl(vd, C.VIDIOC_DQBUF, uintptr(unsafe.Pointer(&bufinfo)))
+		if err != nil {
+			return nil, err
+		}
+
+		if i == 0 {
+			return C.GoBytes(buffers[bufinfo.index], C.int(bufinfo.bytesused)), nil
+		}
+
+		// enqueue buffer
+		err = ioctl(vd, C.VIDIOC_QBUF, uintptr(unsafe.Pointer(&bufinfo)))
+		if err != nil {
+			return nil, err
+		}
+		i--
 	}
-
-	err = ioctl(vd, C.VIDIOC_STREAMON, uintptr(unsafe.Pointer(&qbuf._type)))
-	if err != nil {
-		return nil, err
-	}
-
-	e := C.somemacro(C.int(vd.Fd()))
-	if e == -1 {
-		return nil, ErrUnknown
-	}
-
-	err = ioctl(vd, C.VIDIOC_DQBUF, uintptr(unsafe.Pointer(&qbuf)))
-	if err != nil {
-		return nil, err
-	}
-
-	return C.GoBytes(buffer, C.int(qbuf.bytesused)), nil
 }
 
 // convert YUYV(YUV422) data to image.Image
