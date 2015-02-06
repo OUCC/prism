@@ -7,9 +7,10 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image/jpeg"
-	"io/ioutil"
+	//"io/ioutil"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 const (
@@ -17,35 +18,38 @@ const (
 )
 
 func main() {
-	img, err := capture.Capture(VIDEO_DEVICE)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	for {
+		img, err := capture.Capture(VIDEO_DEVICE)
+		if err != nil {
+			fmt.Println("Error: failed to capture: ", err)
+			return
+		}
 
-	buf := new(bytes.Buffer)
-	err = jpeg.Encode(buf, img, nil)
-	if err != nil {
-		fmt.Println(err)
-	}
-	ioutil.WriteFile("test.jpg", buf.Bytes(), 0644)
-	return
+		buf := new(bytes.Buffer)
+		err = jpeg.Encode(buf, img, nil)
+		if err != nil {
+			fmt.Println(err)
+		}
+		//ioutil.WriteFile("test.jpg", buf.Bytes(), 0644) // for debug
 
-	s := base64.StdEncoding.EncodeToString(buf.Bytes())
-	if err := post(s); err != nil {
-		fmt.Println(err)
+		s := base64.StdEncoding.EncodeToString(buf.Bytes())
+		if err := post(s); err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(time.Now().Format(time.UnixDate), "StatusOK")
+		}
+
+		time.Sleep(5 * time.Minute)
 	}
 }
 
 func post(img string) error {
-	var values url.Values
+	values := url.Values{}
 	values.Add("image", img)
 	values.Add("key", POST_KEY)
 	res, err := http.PostForm(POST_URL, values)
-	if err != nil {
+	if err != nil || res.StatusCode != http.StatusOK {
 		return err
 	}
-	fmt.Printf("Status: %d\n", res.StatusCode)
-	// TOOD
 	return nil
 }
