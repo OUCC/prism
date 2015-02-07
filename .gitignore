@@ -1,1 +1,7 @@
-settings.go
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+settings.py
+tmp.jpg
+
