@@ -13,6 +13,7 @@ Row {
         }
 
         MetroPanel {
+            id: cardPanel
             size: 'small'
             color: '#AF193F'
 
@@ -25,6 +26,7 @@ Row {
     }
 
     MetroPanel {
+        id: messagePanel
         size: 'small'
         color: '#0089D1'
 
