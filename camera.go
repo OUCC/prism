@@ -24,6 +24,10 @@ type imageData struct {
 func init() {
 	cam0 = cv.NewCameraCapture(0)
 	if cam0 == nil {
+		if DEBUG {
+			Log.Debug("can not open camera")
+			return
+		}
 		Log.Fatal("can not open camera")
 	}
 }
