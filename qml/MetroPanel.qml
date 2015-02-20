@@ -1,4 +1,4 @@
-import QtQuick 2.4
+import QtQuick 2.2
 
 Rectangle {
     property int _side: 180
