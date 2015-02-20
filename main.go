@@ -26,7 +26,7 @@ func run() error {
 	win.Show()
 
 	go readAndPost()
-	//go captureAndPost()
+	go captureAndPost()
 
 	win.Wait()
 	return nil

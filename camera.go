@@ -34,11 +34,7 @@ func init() {
 
 func captureAndPost() {
 	for {
-		if DEBUG {
-			time.Sleep(30 * time.Second)
-		} else {
-			time.Sleep(10 * time.Minute)
-		}
+		time.Sleep(CAMERA_INTERVAL)
 
 		if !cam0.GrabFrame() {
 			continue
