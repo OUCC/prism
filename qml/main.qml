@@ -6,7 +6,6 @@ ApplicationWindow {
     id: mainWindow
     title: qsTr("Prism")
     visibility: Window.FullScreen
-    minimumWidth: 800; minimumHeight: 640
 
     Item {
         focus: true
