@@ -21,9 +21,8 @@ MetroPanel {
             top: parent.top; topMargin: 10
             right: parent.right; rightMargin: 40
         }
-        font {
-            pixelSize: 80
-        }
+        font.family: numberFont.name
+        font.pixelSize: 80
         color: 'white'
     }
 
@@ -33,9 +32,7 @@ MetroPanel {
             top: dateText.bottom; topMargin: -16
             horizontalCenter: dateText.horizontalCenter
         }
-        font {
-            pixelSize: 24
-        }
+        font.pixelSize: 24
         color: 'white'
     }
 

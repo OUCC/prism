@@ -51,9 +51,9 @@ Modal {
         Text {
             id: loginText
             anchors.centerIn: parent
-            text: readerStatus.data.firstLogin ? "はじめまして，" + readerStatus.data.handleName
-                                                 + "さん" : readerStatus.data.handleName
-                                                 + "氏 ログインしました"
+            text: readerStatus.data.firstLogin ?
+                      "Nice to meet you, " + readerStatus.data.handleName :
+                      "Good morning, " + readerStatus.data.handleName
             font.pixelSize: 64
             color: 'white'
             visible: readerStatus.data.event === 'in'
@@ -62,7 +62,7 @@ Modal {
         Text {
             id: logoutText
             anchors.centerIn: parent
-            text: readerStatus.data.handleName + "氏 ログアウトしました"
+            text: "See you, " + readerStatus.data.handleName
             font.pixelSize: 64
             color: 'white'
             visible: readerStatus.data.event === 'out'
@@ -78,10 +78,11 @@ Modal {
             }
             text: {
                 var now = new Date()
-                return (now.getMonth() + 1) + "月" + now.getDate(
-                            ) + "日 " + now.getHours(
-                            ) + "時" + now.getMinutes() + "分"
+                return (now.getMonth() + 1) + "/" + now.getDate(
+                            ) + " " + now.getHours(
+                            ) + ":" + now.getMinutes()
             }
+            font.family: numberFont.name
             font.pixelSize: 32
             color: 'white'
             visible: readerStatus.status === 'posted'

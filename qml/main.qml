@@ -17,6 +17,14 @@ ApplicationWindow {
         id: fontawesome
         source: "font/fontawesome-webfont.ttf"
     }
+    FontLoader {
+        id: japaneseFont
+        // TODO
+    }
+    FontLoader {
+        id: numberFont
+        source: "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
+    }
 
     BackgroundSwirls {
         anchors.fill: parent

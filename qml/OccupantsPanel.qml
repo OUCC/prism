@@ -34,6 +34,7 @@ MetroPanel {
                 right: peopleText.left
                 rightMargin: 10
             }
+            font.family: numberFont.name
             font.pixelSize: 64
             text: occupants.len
             color: 'white'
