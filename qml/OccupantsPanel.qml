@@ -7,23 +7,23 @@ MetroPanel {
     FontAwesomeIcon {
         anchors {
             left: parent.left
-            leftMargin: 20
+            leftMargin: 5*unit
             bottom: parent.bottom
-            bottomMargin: 20
+            bottomMargin: 5*unit
         }
 
-        size: 32
+        size: 8*unit
         icon: '\uf0c0'
     }
 
     Item {
         anchors {
             top: parent.top
-            topMargin: 10
+            topMargin: 2*unit
             bottom: parent.bottom
-            bottomMargin: 10
+            bottomMargin: 2*unit
             right: parent.right
-            rightMargin: 20
+            rightMargin: 5*unit
         }
 
         Text {
@@ -32,10 +32,10 @@ MetroPanel {
             anchors {
                 top: parent.top
                 right: peopleText.left
-                rightMargin: 10
+                rightMargin: 2*unit
             }
             font.family: numberFont.name
-            font.pixelSize: 64
+            font.pixelSize: 16*unit
             text: occupants.len
             color: 'white'
         }
@@ -45,20 +45,20 @@ MetroPanel {
 
             anchors {
                 bottom: numberText.bottom
-                bottomMargin: 16
+                bottomMargin: 4*unit
                 right: parent.right
             }
-            font.pixelSize: 24
+            font.pixelSize: 6*unit
             text: 'people'
             color: 'white'
         }
 
         Column {
             clip: true
-            spacing: 5
+            spacing: 1*unit
             anchors {
                 top: numberText.bottom
-                topMargin: 10
+                topMargin: 2*unit
                 bottom: parent.bottom
                 right: parent.right
             }
@@ -67,7 +67,7 @@ MetroPanel {
                 model: occupants.len
                 delegate: Text {
                     text: occupants.get(index)
-                    font.pixelSize: 24
+                    font.pixelSize: 6*unit
                     color: 'white'
                 }
             }

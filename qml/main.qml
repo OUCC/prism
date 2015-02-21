@@ -7,6 +7,8 @@ ApplicationWindow {
     title: qsTr("Prism")
     visibility: Window.FullScreen
 
+    property int unit: 4
+
     Item {
         focus: true
         Keys.onEscapePressed: mainWindow.close()
@@ -32,10 +34,10 @@ ApplicationWindow {
     Column {
         anchors.fill: parent
         anchors {
-            topMargin: 50; bottomMargin: 100
-            leftMargin: 100; rightMargin: 100
+            topMargin: 12*unit; bottomMargin: 25*unit
+            leftMargin: 25*unit; rightMargin: 25*unit
         }
-        spacing: 50
+        spacing: 12*unit
 
         Item {
             id: headerBar

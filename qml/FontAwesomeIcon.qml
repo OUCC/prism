@@ -1,7 +1,7 @@
 import QtQuick 2.2
 
 Text {
-    property int size: 30
+    property int size: 8*unit
     property string icon
 
     font.family: fontawesome.name

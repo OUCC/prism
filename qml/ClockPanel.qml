@@ -6,11 +6,11 @@ MetroPanel {
 
     FontAwesomeIcon {
         anchors {
-            left: parent.left; leftMargin: 20
-            bottom: parent.bottom; bottomMargin: 20
+            left: parent.left; leftMargin: 5*unit
+            bottom: parent.bottom; bottomMargin: 5*unit
         }
 
-        size: 32
+        size: 8*unit
         icon: '\uf073'
     }
 
@@ -18,21 +18,21 @@ MetroPanel {
         id: dateText
 
         anchors {
-            top: parent.top; topMargin: 10
-            right: parent.right; rightMargin: 40
+            top: parent.top; topMargin: 2*unit
+            right: parent.right; rightMargin: 10*unit
         }
         font.family: numberFont.name
-        font.pixelSize: 80
+        font.pixelSize: 20*unit
         color: 'white'
     }
 
     Text {
         id: dayText
         anchors {
-            top: dateText.bottom; topMargin: -16
+            top: dateText.bottom; topMargin: -4*unit
             horizontalCenter: dateText.horizontalCenter
         }
-        font.pixelSize: 24
+        font.pixelSize: 8*unit
         color: 'white'
     }
 

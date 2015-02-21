@@ -3,16 +3,16 @@ import QtQuick 2.2
 Row {
     property bool isOnline: true
 
-    spacing: 15
+    spacing: 4*unit
 
     Rectangle {
         id: circle
         anchors.verticalCenter: parent.verticalCenter
-        width: 40; height: width
+        width: 10*unit; height: width
         radius: width/2
         border {
             color: 'white'
-            width: 3
+            width: 1*unit
         }
 
         color: isOnline ? '#6CCB33' : 'red'
@@ -24,7 +24,7 @@ Row {
         width: txt_.width
         anchors.verticalCenter: parent.verticalCenter
         text: isOnline ? 'Online' : 'Offline'
-        font.pixelSize: 40
+        font.pixelSize: 10*unit
         color: 'white'
     }
 

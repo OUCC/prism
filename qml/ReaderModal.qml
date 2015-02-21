@@ -7,43 +7,43 @@ Modal {
 
         Column {
             anchors.centerIn: parent
-            spacing: 40
+            spacing: 10*unit
             visible: readerStatus.status === 'posting'
             Row {
-                spacing: 60
+                spacing: 15*unit
                 FontAwesomeIcon {
                     icon: '\uf09d'
-                    size: 80
-                    rotation: 40
+                    size: 20*unit
+                    rotation: 10*unit
                 }
                 Text {
                     text: "Sending..."
-                    font.pixelSize: 80
+                    font.pixelSize: 20*unit
                     font.bold: true
                     color: 'white'
                 }
             }
             Loading {
                 anchors.horizontalCenter: parent.horizontalCenter
-                size: 80
+                size: 20*unit
             }
         }
 
         Column {
             id: errorText
             anchors.centerIn: parent
-            spacing: 20
+            spacing: 5*unit
             visible: readerStatus.status === 'error'
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Error"
-                font.pixelSize: 80
+                font.pixelSize: 20*unit
                 font.bold: true
                 color: 'white'
             }
             Text {
                 text: readerStatus.error
-                font.pointSize: 24
+                font.pointSize: 6*unit
                 color: 'white'
             }
         }
@@ -54,7 +54,7 @@ Modal {
             text: readerStatus.data.firstLogin ?
                       "Nice to meet you, " + readerStatus.data.handleName :
                       "Good morning, " + readerStatus.data.handleName
-            font.pixelSize: 64
+            font.pixelSize: 16*unit
             color: 'white'
             visible: readerStatus.data.event === 'in'
         }
@@ -63,7 +63,7 @@ Modal {
             id: logoutText
             anchors.centerIn: parent
             text: "See you, " + readerStatus.data.handleName
-            font.pixelSize: 64
+            font.pixelSize: 16*unit
             color: 'white'
             visible: readerStatus.data.event === 'out'
         }
@@ -72,9 +72,9 @@ Modal {
             id: timeText
             anchors {
                 bottom: parent.bottom
-                bottomMargin: 20
+                bottomMargin: 5*unit
                 right: parent.right
-                rightMargin: 20
+                rightMargin: 5*unit
             }
             text: {
                 var now = new Date()
@@ -83,7 +83,7 @@ Modal {
                             ) + ":" + now.getMinutes()
             }
             font.family: numberFont.name
-            font.pixelSize: 32
+            font.pixelSize: 8*unit
             color: 'white'
             visible: readerStatus.status === 'posted'
         }

@@ -1,7 +1,7 @@
 import QtQuick 2.2
 
 Row {
-    spacing: 20
+    spacing: 5*unit
 
     ClockPanel {
     }
@@ -20,7 +20,7 @@ Row {
             FontAwesomeIcon {
                 anchors.centerIn: parent
                 icon: '\uf09d'
-                size: 128
+                size: 32*unit
             }
         }
     }
@@ -33,7 +33,7 @@ Row {
         FontAwesomeIcon {
             anchors.centerIn: parent
             icon: '\uf0e6'
-            size: 128
+            size: 32*unit
         }
     }
 }
