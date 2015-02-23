@@ -1,6 +1,8 @@
 package main
 
 import (
+	. "github.com/OUCC/prism/logger"
+
 	"gopkg.in/qml.v1"
 )
 
@@ -9,6 +11,8 @@ var (
 )
 
 func main() {
+	setupReader()
+
 	if err := qml.Run(run); err != nil {
 		Log.Fatal(err)
 	}
@@ -25,8 +29,8 @@ func run() error {
 	win = component.CreateWindow(nil)
 	win.Show()
 
-	go readAndPost()
-	go captureAndPost()
+	go readDevice()
+	go waitAndPost()
 
 	win.Wait()
 	return nil

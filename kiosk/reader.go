@@ -1,6 +1,8 @@
 package main
 
 import (
+	. "github.com/OUCC/prism/logger"
+
 	"github.com/gvalkov/golang-evdev/evdev"
 	"gopkg.in/qml.v1"
 
@@ -60,7 +62,7 @@ var (
 	occupants    = &Occupants{}
 )
 
-func init() {
+func setupReader() {
 	devices, err := evdev.ListInputDevices()
 	if err != nil {
 		Log.Fatal(err)
@@ -74,10 +76,6 @@ func init() {
 	}
 
 	if reader == nil {
-		if DEBUG {
-			Log.Debug("card reader not found")
-			return
-		}
 		Log.Fatal("card reader not found")
 	}
 
@@ -163,9 +161,7 @@ func toRune(key uint16) rune {
 	}
 }
 
-func readAndPost() {
-	go readDevice()
-
+func waitAndPost() {
 	for {
 		readerStatus.Status = "waiting"
 		readerStatus.changed()
