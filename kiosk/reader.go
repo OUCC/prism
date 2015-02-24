@@ -195,7 +195,7 @@ func waitAndPost() {
 		if resp.StatusCode != http.StatusCreated {
 			Log.Error("Error posting log data")
 			readerStatus.Status = "error"
-			readerStatus.Error = err.Error()
+			readerStatus.Error = resp.Status
 			readerStatus.changed()
 			time.Sleep(5 * time.Second)
 			continue
