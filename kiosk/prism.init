@@ -10,7 +10,7 @@
 ### END INIT INFO
 dir="/home/oucc/prism"
 user="oucc"
-cmd="HOME=/home/oucc /home/oucc/prism/kiosk"
+cmd="LD_LIBRARY_PATH=/opt/Qt/5.4/gcc/lib /home/oucc/prism/kiosk"
 name=`basename $0`
 pid_file="/var/run/$name.pid"
 stdout_log="/var/log/$name.log"
