@@ -20,7 +20,7 @@ ApplicationWindow {
     }
     FontLoader {
         id: japaneseFont
-        // TODO
+        source: "/usr/share/fonts/truetype/migmix/migmix-1p-regular.ttf"
     }
     FontLoader {
         id: numberFont
