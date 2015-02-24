@@ -11,6 +11,7 @@ import (
 	"image/jpeg"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -29,6 +30,7 @@ func main() {
 	for {
 		if img := capture(); img != nil {
 			post(img)
+			post2(img)
 		}
 
 		time.Sleep(CAPTURE_INTERVAL)
@@ -74,6 +76,22 @@ func post(img []byte) {
 	resp, err := http.Post(IMG_POST_URL, "application/json", bytes.NewReader(b))
 	if err != nil {
 		Log.Error(err.Error())
+	} else if resp.StatusCode != http.StatusCreated {
+		Log.Error(resp.Status)
+	} else {
+		Log.Info(resp.Status)
+	}
+}
+
+func post2(img []byte) {
+	values := url.Values{}
+	values.Add("image", base64.StdEncoding.EncodeToString(img))
+	values.Add("key", PRISM_KEY)
+	resp, err := http.PostForm(IMG_POST_URL2, values)
+	if err != nil {
+		Log.Error(err.Error())
+	} else if resp.StatusCode != http.StatusOK {
+		Log.Error(resp.Status)
 	} else {
 		Log.Info(resp.Status)
 	}
