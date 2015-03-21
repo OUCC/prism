@@ -14,6 +14,7 @@ ApplicationWindow {
         Keys.onEscapePressed: mainWindow.close()
     }
 
+    // fonts
     FontLoader {
         id: fontawesome
         source: "font/fontawesome-webfont.ttf"
@@ -27,6 +28,7 @@ ApplicationWindow {
         source: "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
     }
 
+    // background animation
     BackgroundSwirls {
         anchors.fill: parent
     }
@@ -57,7 +59,27 @@ ApplicationWindow {
 
     ReaderModal {
         id: readerModal
+        objectName: "readerModal"
         anchors.fill: parent
-        state: readerStatus.status === 'waiting' ? 'hide' : 'show'
     }
+
+    FeliCaModal {
+        id: felicaModal
+        objectName: "felicaModal"
+        anchors.fill: parent
+    }
+
+    // for test
+//    Timer {
+//        property int i: 0
+//        interval: 1000
+//        running: true
+//        repeat: Animation.Infinite
+//        onTriggered: {
+//            if(i==0) readerModal.showReaderPosting();
+//            if(i==1) readerModal.showReaderError("eee");
+//            if(i==2) readerModal.showReaderInfo("login", "hoge", false);
+//            i++;
+//        }
+//    }
 }

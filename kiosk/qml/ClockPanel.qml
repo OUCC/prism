@@ -32,14 +32,15 @@ MetroPanel {
             top: dateText.bottom; topMargin: -4*unit
             horizontalCenter: dateText.horizontalCenter
         }
-        font.pixelSize: 8*unit
+        font.pixelSize: 6*unit
         color: 'white'
     }
 
     Timer {
         running: true
         repeat: true
-        interval: 1000
+        interval: 60000
+        triggeredOnStart: true
         onTriggered: {
             var now = new Date();
             var day_names = ["Sunday", "Monday", "Tuesday",

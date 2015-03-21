@@ -4,13 +4,14 @@ Item {
     id: modal
 
     property alias modalContent: modalMain.children
-
-    state: 'show'
+    property alias modalColor: modalMain.color
+    property bool modalVisible
 
     Rectangle {
         id: modalBack
         anchors.fill: parent
         color: 'black'
+        opacity: 0
     }
 
     Rectangle {
@@ -18,42 +19,43 @@ Item {
         anchors.centerIn: parent
         width: parent.width
         height: parent.height / 2
-        color: '#1E90FF'
+        opacity: 0
     }
 
-    states: [
-        State {
-            name: 'show'
-            PropertyChanges {
-                target: modalBack
-                opacity: 0.5
-            }
-            PropertyChanges {
-                target: modalMain
-                opacity: 1
-            }
-        },
-        State {
-            name: 'hide'
-            PropertyChanges {
-                target: modalBack
-                opacity: 0
-            }
-            PropertyChanges {
-                target: modalMain
-                opacity: 0
-            }
+    onModalVisibleChanged: {
+        if (modalVisible) {
+            inAnim.restart();
         }
-    ]
+        else {
+            outAnim.restart();
+        }
+    }
 
-    transitions: Transition {
-        NumberAnimation {
-            target: modalBack; property: 'opacity'
-            duration: 1000
+    ParallelAnimation {
+        id: inAnim
+        OpacityAnimator {
+            target: modalBack
+            duration: 500
+            from: 0; to: 0.5
         }
-        NumberAnimation {
-            target: modalMain; property: 'opacity'
-            duration: 333
+        OpacityAnimator {
+            target: modalMain
+            duration: 500
+            from: 0; to: 1
+        }
+    }
+
+    ParallelAnimation {
+        id: outAnim
+        OpacityAnimator {
+            target: modalBack
+            duration: 500
+            from: 0.5; to: 0
+        }
+        OpacityAnimator {
+            target: modalMain
+            duration: 500
+            from: 1; to: 0
         }
     }
 }

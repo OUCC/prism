@@ -1,32 +1,37 @@
 import QtQuick 2.2
+import QtMultimedia 5.0
 
 Modal {
-    id: readerModal
+    id: felicaModal
 
     modalVisible: state !== 'waiting'
-    modalColor: '#1E90FF'
+    modalColor: '#FF831E'
 
-    function showReaderPosting() {
+    function showFeliCaPosting() {
         state = 'posting';
         timer.stop();
     }
 
-    function showReaderInfo(info, handleName, isFirstLogin) {
+    function showFeliCaInfo(info, handleName, isFirstLogin) {
         state = 'info';
         infoMsg.info = info;
         infoMsg.handleName = handleName;
         infoMsg.isFirstLogin = isFirstLogin;
 
         timer.interval = 5000;
-        timer.restart()
+        timer.restart();
     }
 
-    function showReaderError(text) {
+    function showFeliCaRegistration() {
+        state = 'register';
+    }
+
+    function showFeliCaError(text) {
         state = 'error';
         errorMsg.errorText = text;
 
         timer.interval = 10000;
-        timer.restart()
+        timer.restart();
     }
 
     state: 'waiting'
@@ -40,6 +45,9 @@ Modal {
         },
         State {
             name: 'info'
+        },
+        State {
+            name: 'register'
         },
         State {
             name: 'error'
@@ -60,21 +68,22 @@ Modal {
             id: postingMsg
 
             anchors.centerIn: parent
-            visible: readerModal.state === 'posting'
+            visible: felicaModal.state === 'posting'
         }
 
         ErrorMessage {
             id: errorMsg
 
             anchors.centerIn: parent
-            visible: readerModal.state === 'error'
+            visible: felicaModal.state === 'error'
         }
 
         InfoMessage {
             id: infoMsg
 
             anchors.centerIn: parent
-            visible: readerModal.state === 'info'
+            visible: felicaModal.state === 'info'
         }
     }
 }
+
