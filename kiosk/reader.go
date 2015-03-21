@@ -4,62 +4,11 @@ import (
 	. "github.com/OUCC/prism/logger"
 
 	"github.com/gvalkov/golang-evdev/evdev"
-	"gopkg.in/qml.v1"
-
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
-	"time"
 )
 
-type logData struct {
-	Key      string `json:"key"`
-	MemberID string `json:"member_id"`
-	When     int64  `json:"when"`
-}
-
-type EventData struct {
-	MemberID   string   `json:"member_id"`
-	When       int64    `json:"when"`
-	HandleName string   `json:"handle_name"`
-	Event      string   `json:"event"`
-	FirstLogin bool     `json:"first_login"`
-	Occupants  []string `json:"occupants"`
-}
-
-type ReaderStatus struct {
-	Status string
-	Data   EventData
-	Error  string
-}
-
-func (status *ReaderStatus) changed() {
-	qml.Changed(status, &status.Error)
-	qml.Changed(status, &status.Data)
-	qml.Changed(status, &status.Status)
-}
-
-type Occupants struct {
-	data []string
-	Len  int
-}
-
-func (s *Occupants) set(data []string) {
-	s.data = data
-	s.Len = len(data)
-	qml.Changed(s, &s.Len)
-}
-
-func (s *Occupants) Get(index int) string {
-	return s.data[index]
-}
-
 var (
-	reader       *evdev.InputDevice
-	code         = make(chan string, 0)
-	readerStatus = &ReaderStatus{}
-	occupants    = &Occupants{}
+	reader     *evdev.InputDevice
+	readerCode = make(chan string, 0)
 )
 
 func setupReader() {
@@ -82,7 +31,7 @@ func setupReader() {
 	Log.Debug(reader.String())
 }
 
-func readDevice() {
+func readerLoop() {
 	ret := make([]rune, 0, 100)
 
 	for {
@@ -95,7 +44,7 @@ func readDevice() {
 			switch ev.Code {
 			case evdev.KEY_ENTER:
 				Log.Debug("Card reader input: %s", string(ret))
-				code <- string(ret)
+				readerCode <- string(ret)
 				ret = make([]rune, 0, 100) // reset
 			default:
 				ret = append(ret, toRune(ev.Code))
@@ -158,65 +107,5 @@ func toRune(key uint16) rune {
 		return 'N'
 	default:
 		return '?'
-	}
-}
-
-func waitAndPost() {
-	for {
-		readerStatus.Status = "waiting"
-		readerStatus.changed()
-
-		id := <-code
-		if len(id) == 0 {
-			continue
-		}
-
-		id = id[12:20]
-		Log.Debug("Student ID: %s", id)
-
-		readerStatus.Status = "posting"
-		readerStatus.changed()
-
-		b, _ := json.Marshal(logData{
-			Key:      PRISM_KEY,
-			MemberID: id,
-			When:     time.Now().Unix(),
-		})
-		resp, err := http.Post(LOG_POST_URL, "application/json", bytes.NewReader(b))
-		if err != nil {
-			Log.Error(err.Error())
-			readerStatus.Status = "error"
-			readerStatus.Error = err.Error()
-			readerStatus.changed()
-			time.Sleep(5 * time.Second)
-			continue
-		}
-		Log.Debug(resp.Status)
-		if resp.StatusCode != http.StatusCreated {
-			Log.Error("Error posting log data")
-			readerStatus.Status = "error"
-			readerStatus.Error = resp.Status
-			readerStatus.changed()
-			time.Sleep(5 * time.Second)
-			continue
-		}
-
-		data := EventData{}
-		b, _ = ioutil.ReadAll(resp.Body)
-		defer resp.Body.Close()
-
-		if err := json.Unmarshal(b, &data); err != nil {
-			Log.Error(err.Error())
-		}
-
-		Log.Debug("HandleName: %s, Event: %s, FirstLogin: %t, Occupants: %v",
-			data.HandleName, data.Event, data.FirstLogin, data.Occupants)
-
-		readerStatus.Status = "posted"
-		readerStatus.Data = data
-		readerStatus.changed()
-		occupants.set(data.Occupants)
-
-		time.Sleep(3 * time.Second)
 	}
 }
