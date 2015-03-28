@@ -89,9 +89,12 @@ func waitAndPost() {
 				continue
 			}
 
-			cmd := exec.Command("play", "felica.mp3")
-			if err := cmd.Start(); err != nil {
-				Log.Error(err.Error())
+			if PASORI_SOUND {
+				// play sound
+				cmd := exec.Command("play", "felica.mp3")
+				if err := cmd.Start(); err != nil {
+					Log.Error(err.Error())
+				}
 			}
 
 			felicaModal.Call("showFeliCaPosting")
