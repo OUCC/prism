@@ -15,18 +15,7 @@ import (
 	"time"
 )
 
-var (
-	cam0 *cv.Capture
-)
-
-type imageData struct {
-	Key   string `json:"key"`
-	Image string `json:"image"`
-}
-
 func main() {
-	setupCamera()
-
 	for {
 		if img := capture(); img != nil {
 			post(img)
@@ -37,25 +26,26 @@ func main() {
 	}
 }
 
-func setupCamera() {
-	cam0 = cv.NewCameraCapture(0)
-	if cam0 == nil {
-		Log.Fatal("can not open camera")
-	}
-}
-
 func capture() []byte {
-	if !cam0.GrabFrame() {
+	cam := cv.NewCameraCapture(0)
+	if cam == nil {
+		Log.Error("can not open camera")
 		return nil
+	}
+	defer cam.Release()
+
+	for i := 0; i < DROP_FRAME; i++ {
+		cam.QueryFrame()
 	}
 
 	//!!!DO NOT RELEASE or MODIFY the retrieved frame!!!
-	img := cam0.RetrieveFrame(1)
+	img := cam.QueryFrame()
 	if img == nil {
 		Log.Error("failed to capture")
 		return nil
 	}
 
+	// convert IplImage to jpeg
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, img.ToImage(), nil)
 	if err != nil {
@@ -69,7 +59,12 @@ func capture() []byte {
 }
 
 func post(img []byte) {
-	b, _ := json.Marshal(imageData{
+	type post struct {
+		Key   string `json:"key"`
+		Image string `json:"image"`
+	}
+
+	b, _ := json.Marshal(post{
 		Key:   PRISM_KEY,
 		Image: base64.StdEncoding.EncodeToString(img),
 	})
