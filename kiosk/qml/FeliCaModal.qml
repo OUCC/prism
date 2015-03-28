@@ -22,8 +22,12 @@ Modal {
         timer.restart();
     }
 
-    function showFeliCaRegistration() {
+    function showFeliCaRegistration(felicaIDm) {
         state = 'register';
+        registerMsg.felicaIDm = felicaIDm;
+
+        timer.interval = 30000;
+        timer.restart();
     }
 
     function showFeliCaError(text) {
@@ -69,6 +73,13 @@ Modal {
 
             anchors.centerIn: parent
             visible: felicaModal.state === 'posting'
+        }
+
+        RegisterMessage {
+            id: registerMsg
+
+            anchors.centerIn: parent
+            visible: felicaModal.state === 'register'
         }
 
         ErrorMessage {

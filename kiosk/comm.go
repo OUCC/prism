@@ -11,6 +11,10 @@ import (
 	"time"
 )
 
+var (
+	ErrNotRegistered = errors.New("FeliCa IDm not registered")
+)
+
 func updateLog(memberID string, felicaIDm string) (string, string, bool, []string, error) {
 	type post struct {
 		Key       string `json:"key"`
@@ -31,6 +35,9 @@ func updateLog(memberID string, felicaIDm string) (string, string, bool, []strin
 		return "", "", false, nil, err
 	}
 	Log.Debug(resp.Status)
+	if resp.StatusCode == http.StatusNotFound {
+		return "", "", false, nil, ErrNotRegistered
+	}
 	if resp.StatusCode != http.StatusCreated {
 		return "", "", false, nil, errors.New(resp.Status)
 	}
@@ -54,6 +61,7 @@ func updateLog(memberID string, felicaIDm string) (string, string, bool, []strin
 	return data.Event, data.HandleName, data.FirstLogin, data.Occupants, nil
 }
 
+// 使ってない
 func registerFeliCa(memberID string, felicaIDm string) error {
 	type post struct {
 		Key       string `json:"key"`

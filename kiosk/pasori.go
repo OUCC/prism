@@ -46,6 +46,6 @@ func pasoriLoop() {
 
 			pasoriCode <- idmStr
 		}
-		time.Sleep(3 * time.Second)
+		time.Sleep(PASORI_INTERVAL)
 	}
 }

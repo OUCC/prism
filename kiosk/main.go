@@ -98,7 +98,11 @@ func waitAndPost() {
 
 			info, handleName, isFirstLogin, occupantList, err := updateLog("", id)
 			if err != nil {
-				felicaModal.Call("showFeliCaError", err.Error())
+				if err == ErrNotRegistered {
+					felicaModal.Call("showFeliCaRegistration", id)
+				} else {
+					felicaModal.Call("showFeliCaError", err.Error())
+				}
 				continue
 			}
 
