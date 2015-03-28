@@ -33,10 +33,10 @@ var (
 )
 
 func main() {
-	//	setupReader()
+	setupReader()
 	setupPaSoRi()
 
-	//	go readerLoop()
+	go readerLoop()
 	go pasoriLoop()
 	go waitAndPost()
 

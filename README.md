@@ -52,6 +52,9 @@ Linux Online Installerをダウンロードし，Qt5.4をインストールし�
 
 goのセットアップは済ませたものとする．
 
+FeliCaリーダー(PaSoRi)を利用するため，libpafeをインストールしておく必要がある．
+詳細は[libpafe](http://homepage3.nifty.com/slokar/pasori/libpafe.html)
+
 ```bash
 export PKG_CONFIG_PATH=/opt/Qt/5.4/gcc/lib/pkgconfig
 export LD_LIBRARY_PATH=/opt/Qt/5.4/gcc/lib
@@ -69,8 +72,12 @@ run.shは適宜編集すること．
 
 ```bash
 sudo apt-get install fonts-migmix # QML内で使用
+sudo apt-get install sox libsox-fmt-mp3 # mp3ファイルの再生に必要
+sudo cp libpafe.so.0 /usr/lib/ # libpafeのライブラリをコピー
 ./run.sh
 ```
+
+画面サイズに合わせてqml/main.qmlの`unit`の値を調整すること．
 
 何回か実行しないと起動しなかったりする．カードリーダーは接続しないと起動しない．
 起動したらカードを通してみて動くこと，日本語が表示されることを確認すること．
