@@ -34,11 +34,14 @@ var (
 )
 
 func main() {
-	setupReader()
-	setupPaSoRi()
-
-	go readerLoop()
-	go pasoriLoop()
+	if CARDREADER_ENABLED {
+		setupReader()
+		go readerLoop()
+	}
+	if PASORI_ENABLED {
+		setupPaSoRi()
+		go pasoriLoop()
+	}
 	go waitAndPost()
 
 	if err := qml.Run(run); err != nil {
