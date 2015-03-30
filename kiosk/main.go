@@ -6,6 +6,7 @@ import (
 	"gopkg.in/qml.v1"
 
 	"os/exec"
+	"time"
 )
 
 // 部室滞在者のリスト
@@ -86,13 +87,14 @@ func waitAndPost() {
 
 		case id := <-pasoriCode:
 			if len(id) == 0 {
+				pasoriWait <- 0 * time.Second
 				continue
 			}
 
 			if PASORI_SOUND {
 				// play sound
 				cmd := exec.Command("play", "felica.mp3")
-				if err := cmd.Start(); err != nil {
+				if err := cmd.Run(); err != nil {
 					Log.Error(err.Error())
 				}
 			}
@@ -103,14 +105,17 @@ func waitAndPost() {
 			if err != nil {
 				if err == ErrNotRegistered {
 					felicaModal.Call("showFeliCaRegistration", id)
+					pasoriWait <- 30 * time.Second
 				} else {
 					felicaModal.Call("showFeliCaError", err.Error())
+					pasoriWait <- 10 * time.Second
 				}
 				continue
 			}
 
 			occupants.set(occupantList)
 			felicaModal.Call("showFeliCaInfo", info, handleName, isFirstLogin)
+			pasoriWait <- 5 * time.Second
 		}
 	}
 }

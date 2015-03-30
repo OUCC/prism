@@ -14,7 +14,8 @@ import (
 
 var (
 	pasori     *C.pasori
-	pasoriCode = make(chan string, 0)
+	pasoriCode = make(chan string)
+	pasoriWait = make(chan time.Duration)
 )
 
 func setupPaSoRi() {
@@ -45,6 +46,8 @@ func pasoriLoop() {
 			Log.Debug(idmStr)
 
 			pasoriCode <- idmStr
+
+			time.Sleep(<-pasoriWait) // wait for comm and sleep
 		}
 		time.Sleep(PASORI_INTERVAL)
 	}
