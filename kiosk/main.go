@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/qml.v1"
 
-	"os/exec"
+	//"os/exec"
 	"time"
 )
 
@@ -96,10 +96,14 @@ func waitAndPost() {
 
 			if PASORI_SOUND {
 				// play sound
-				cmd := exec.Command("play", "felica.mp3")
-				if err := cmd.Run(); err != nil {
-					Log.Error(err.Error())
-				}
+
+				// SIGTRAP
+				//cmd := exec.Command("play", "felica.mp3")
+				//if err := cmd.Run(); err != nil {
+				//Log.Error(err.Error())
+				//}
+
+				playSound("felica.mp3")
 			}
 
 			felicaModal.Call("showFeliCaPosting")
