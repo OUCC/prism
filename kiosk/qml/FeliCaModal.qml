@@ -22,9 +22,10 @@ Modal {
         timer.restart();
     }
 
-    function showFeliCaRegistration(felicaIDm) {
+    function showFeliCaRegistration(felicaIDm, info) {
         state = 'register';
         registerMsg.felicaIDm = felicaIDm;
+        registerMsg.info = info;
 
         timer.interval = 30000;
         timer.restart();

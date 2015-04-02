@@ -61,7 +61,6 @@ func updateLog(memberID string, felicaIDm string) (string, string, bool, []strin
 	return data.Event, data.HandleName, data.FirstLogin, data.Occupants, nil
 }
 
-// 使ってない
 func registerFeliCa(memberID string, felicaIDm string) error {
 	type post struct {
 		Key       string `json:"key"`

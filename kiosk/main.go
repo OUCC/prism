@@ -111,8 +111,18 @@ func waitAndPost() {
 			info, handleName, isFirstLogin, occupantList, err := updateLog("", id)
 			if err != nil {
 				if err == ErrNotRegistered {
-					felicaModal.Call("showFeliCaRegistration", id)
-					pasoriWait <- 30 * time.Second
+					// start registration
+					felicaModal.Call("showFeliCaRegistration", id, "waiting")
+					select {
+					case id2 := <-readerCode:
+						if err := registerFeliCa(id2[12:20], id); err != nil {
+							felicaModal.Call("showFeliCaRegistration", id, err.Error())
+						}
+						felicaModal.Call("showFeliCaRegistration", id, "success")
+
+					case <-time.After(30 * time.Second): // do nothing
+					}
+					pasoriWait <- 0 * time.Second // restart felica scan
 				} else {
 					felicaModal.Call("showFeliCaError", err.Error())
 					pasoriWait <- 10 * time.Second
