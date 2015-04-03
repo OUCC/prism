@@ -117,12 +117,14 @@ func waitAndPost() {
 					case id2 := <-readerCode:
 						if err := registerFeliCa(id2[12:20], id); err != nil {
 							felicaModal.Call("showFeliCaRegistration", id, err.Error())
+						} else {
+							felicaModal.Call("showFeliCaRegistration", id, "success")
 						}
-						felicaModal.Call("showFeliCaRegistration", id, "success")
+						pasoriWait <- 10 * time.Second // restart felica scan
 
 					case <-time.After(30 * time.Second): // do nothing
+						pasoriWait <- 0 * time.Second
 					}
-					pasoriWait <- 0 * time.Second // restart felica scan
 				} else {
 					felicaModal.Call("showFeliCaError", err.Error())
 					pasoriWait <- 10 * time.Second

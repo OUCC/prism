@@ -27,7 +27,7 @@ Modal {
         registerMsg.felicaIDm = felicaIDm;
         registerMsg.info = info;
 
-        timer.interval = 30000;
+        timer.interval = info === 'waiting' ? 30000 : 10000;
         timer.restart();
     }
 
