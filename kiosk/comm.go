@@ -74,7 +74,7 @@ func registerFeliCa(memberID string, felicaIDm string) error {
 		FeliCaIDm: felicaIDm,
 	})
 
-	resp, err := http.Post(LOG_POST_URL, "application/json", bytes.NewReader(b))
+	resp, err := http.Post(FELICA_POST_URL, "application/json", bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
