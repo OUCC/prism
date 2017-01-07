@@ -1,4 +1,9 @@
-# prism
+# [Obsoleted] prism
+2017年1月7日にWebカメラ制御は OUCC/bushitsu-raspi-cam に移動しました．Pythonで
+書き直し，画像キャプチャにはOpenCVではなくfswebcamを使用するよう変更しました．
+また，以上の変更でcameraが使われなくなったことから，廃止とします．
+kioskは1年以上前から使われていませんでした．
+
 echelonのクライアント．以下の機能の実装を予定しています．
 
 * Webカメラ制御
